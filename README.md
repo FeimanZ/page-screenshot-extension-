@@ -1,4 +1,4 @@
-# 网页长截图插件 v2 (Page Screenshot Extension)
+# 网页一键滚动截图插件 (WebPage Screenshot Extension)
 
 一款简单强大且轻量级的 Chrome 网页长截图扩展插件。
 
