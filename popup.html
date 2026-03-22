@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长截图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 340px;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #0f0f0f;
+    color: #f0f0f0;
+    padding: 16px;
+    min-height: 200px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .header-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #4CAF82, #2E8B57);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .header-title { font-size: 15px; font-weight: 600; }
+  .header-sub { font-size: 11px; color: #888; margin-left: auto; }
+
+  .section { margin-bottom: 14px; }
+  .label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  /* Width Mode */
+  .mode-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+  }
+  .mode-btn {
+    padding: 7px 4px;
+    border: 1px solid #333;
+    background: #1a1a1a;
+    color: #ccc;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .mode-btn:hover { border-color: #4CAF82; color: #4CAF82; }
+  .mode-btn.active { border-color: #4CAF82; background: #1a3a2a; color: #4CAF82; font-weight: 600; }
+
+  .custom-width-row {
+    display: flex; align-items: center; gap: 8px; margin-top: 8px;
+  }
+  .custom-width-row input {
+    flex: 1;
+    padding: 6px 10px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: #f0f0f0;
+    font-size: 13px;
+  }
+  .custom-width-row input:focus { outline: none; border-color: #4CAF82; }
+  .custom-width-row span { font-size: 12px; color: #666; }
+
+  /* Capture Button */
+  #captureBtn {
+    width: 100%;
+    padding: 11px;
+    background: linear-gradient(135deg, #4CAF82, #2E8B57);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  #captureBtn:hover { opacity: 0.9; }
+  #captureBtn:disabled {
+    background: #2a2a2a;
+    color: #555;
+    cursor: not-allowed;
+    opacity: 1;
+  }
+
+  /* Progress */
+  #progressArea {
+    display: none;
+    margin-top: 12px;
+  }
+  .progress-bar-wrap {
+    height: 4px;
+    background: #222;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF82, #7DE8B0);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+  #progressText {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+  }
+
+  /* Result */
+  #resultArea {
+    display: none;
+    margin-top: 12px;
+  }
+  .result-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .preview-wrap {
+    position: relative;
+    background: #111;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    max-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #previewImg {
+    max-width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+  .result-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  .result-meta span { color: #aaa; }
+
+  /* 下载按钮组 */
+  .download-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .dl-btn {
+    padding: 8px 6px;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-weight: 500;
+  }
+  #downloadPngBtn {
+    border: 1px solid #4CAF82;
+    color: #4CAF82;
+  }
+  #downloadPngBtn:hover { background: #1a3a2a; }
+
+  #downloadPdfBtn {
+    border: 1px solid #5B9BD5;
+    color: #5B9BD5;
+  }
+  #downloadPdfBtn:hover { background: #1a2a3a; }
+  #downloadPdfBtn:disabled {
+    border-color: #333;
+    color: #444;
+    cursor: not-allowed;
+  }
+  #downloadPdfBtn .pdf-spinner {
+    display: none;
+    width: 12px; height: 12px;
+    border: 2px solid #5B9BD5;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Error */
+  #errorArea {
+    display: none;
+    margin-top: 12px;
+    background: #2a1515;
+    border: 1px solid #5a2020;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #ff8888;
+  }
+
+  .divider { height: 1px; background: #222; margin: 14px 0; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">📸</div>
+  <span class="header-title">长截图</span>
+  <span class="header-sub">v2.0</span>
+</div>
+
+<div class="section">
+  <div class="label">截图宽度模式</div>
+  <div class="mode-group">
+    <button class="mode-btn active" data-mode="content" title="自动识别 main/article 等主体内容宽度">📄 自动识别</button>
+    <button class="mode-btn" data-mode="full" title="全页面宽度">🌐 全页宽</button>
+    <button class="mode-btn" data-mode="custom" title="自定义宽度">✏️ 自定义</button>
+  </div>
+  <div class="custom-width-row" id="customWidthRow" style="display:none">
+    <input type="number" id="customWidth" placeholder="800" min="320" max="3840" value="800">
+    <span>px</span>
+  </div>
+</div>
+
+<button id="captureBtn">📸 开始截图</button>
+
+<div id="progressArea">
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressFill"></div>
+  </div>
+  <div id="progressText">准备中...</div>
+</div>
+
+<div id="resultArea">
+  <div class="result-card">
+    <div class="preview-wrap">
+      <img id="previewImg" src="" alt="截图预览">
+    </div>
+    <div class="result-meta">
+      <span id="resultDims">尺寸：-</span>
+      <span id="resultSize">大小：-</span>
+    </div>
+    <div class="download-group">
+      <button class="dl-btn" id="downloadPngBtn">⬇️ 下载 PNG</button>
+      <button class="dl-btn" id="downloadPdfBtn">
+        <span class="pdf-spinner" id="pdfSpinner"></span>
+        <span id="pdfBtnText">📄 下载 PDF</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="errorArea"></div>
+
+<script src="popup.js"></script>
+</body>
+</html>
